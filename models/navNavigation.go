@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"fmt"
 	"time"
+	"navsystem/utils"
 )
 
 func init() {
@@ -20,7 +21,6 @@ type NavNavigation struct {
 	Name string
 	Url string
 	GroupLid string
-	GroupName string
 	FaviconUrl string
 	Intro string `form:"intro"`
 	Comments string
@@ -31,16 +31,58 @@ type NavNavigation struct {
 	UpdateTime time.Time
 }
 
-func GetAllNavs() []NavNavigation {
+
+type NavNavigationVO struct {
+	NavNavigation
+	GroupName string
+}
+
+type NavNavigationTreeVO struct {
+	NavDic
+	Children []NavNavigation
+}
+
+
+
+func GetAllNavs() []NavNavigationVO {
 	o :=orm.NewOrm()
-	raw := o.Raw("select * from nav_navigation")
-	var navs []NavNavigation
+	raw := o.Raw("select na.*,nd.`name` group_name from nav_navigation na " +
+		" join nav_dic nd on na.`group_lid`=nd.lid where na.`status`=1 and nd.status=1 order by nd.order_num ")
+	var navs []NavNavigationVO
 	rows, error := raw.QueryRows(&navs)
 	if(error!= nil) {
 		panic(error)
 	}
 	fmt.Println(rows)
 	return navs
+}
+
+func GetAllTreeNavs() []NavNavigationTreeVO {
+	o:=orm.NewOrm()
+	raw := o.Raw("select na.`group_lid` lid,nd.`name` from `nav_navigation` na  " +
+		" join nav_dic nd on na.`group_lid`=nd.lid and nd.`status`=1 where na.status=1 group by na.`group_lid` order by nd.order_num")
+	var navTreeVOs []NavNavigationTreeVO
+	rows, error := raw.QueryRows(&navTreeVOs)
+	if error!= nil {
+		panic(error)
+	}
+	if rows> 0 {
+		for index, navTreeVO := range navTreeVOs {
+			groupLid:= navTreeVO.Lid
+			var navNavigation []NavNavigation
+			raw := o.Raw("select lid,name,url,favicon_url from `nav_navigation` na where na.`group_lid`=? order by order_num",groupLid)
+			queryRows, error := raw.QueryRows(&navNavigation)
+			if error!=nil {
+				panic(error)
+			}
+			fmt.Println(queryRows)
+			if queryRows>0 {
+				navTreeVOs[index].Children=navNavigation
+			}
+		}
+	}
+
+	return navTreeVOs
 }
 
 
@@ -58,6 +100,10 @@ func Get(id string) NavNavigation {
 
 func Add(navgation *NavNavigation) (int64,error){
 	o:=orm.NewOrm()
+	navgation.Status=1
+	navgation.Lid=utils.GenerateUUID()
+	navgation.CreateTime=time.Now()
+	navgation.UpdateTime=time.Now()
 	id, error := o.Insert(navgation)
 	return id,error
 }

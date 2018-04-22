@@ -53,8 +53,8 @@ func (this *NavDicController) Put() {
 	var navDic models.NavDic
 
 	// get获取body参数
-	s := this.GetString("intro")
-	fmt.Println(s)
+	//s := this.GetString("intro")
+	//fmt.Println(s)
 
 	//获取body参数
 	bytes := this.Ctx.Input.RequestBody
@@ -62,12 +62,13 @@ func (this *NavDicController) Put() {
 
 	// 获取json参数
 	json.Unmarshal(this.Ctx.Input.RequestBody, &navDic)
+	fmt.Println(navDic.OrderNum)
 	fmt.Println(navDic)
 
 	//获取form参数
-	this.ParseForm(&navDic)
+	//this.ParseForm(&navDic)
 	//navDic.Id=nid
-	fmt.Println(navDic)
+	//fmt.Println(navDic)
 
 	i, _ := models.UpdateNavDic(&navDic)
 	this.AjaxResponse(200,"success",i)

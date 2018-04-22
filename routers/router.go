@@ -28,9 +28,10 @@ func init() {
 	)
 	beego.AddNamespace(ns)
 	//beego.Router("/navs",&controllers.NavgationController{},"get:GetAll")
-	beego.Router("/nav",&controllers.NavgationController{},"get:GetAll")
-	beego.Router("/nav/:nid",&controllers.NavgationController{},"get:Get;put:Put;delete:Delete")
-	beego.Router("/nav",&controllers.NavgationController{},"post:Post")
+	beego.Router("/nav",&controllers.NavgationController{},"get:GetAll;put:Put;post:Post")
+	beego.Router("/nav/list",&controllers.NavgationController{},"get:GetAllTreeNavs")
+	beego.Router("/nav/:nid",&controllers.NavgationController{},"get:Get;delete:Delete")
+	beego.Router("/nav/init",&controllers.NavgationController{},"*:InitData")
 
 	beego.Router("/navdic",&controllers.NavDicController{},"get:GetAll;post:Post;put:Put")
 	beego.Router("/navdic/:nid",&controllers.NavDicController{},"get:Get;delete:Delete")

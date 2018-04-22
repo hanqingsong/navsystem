@@ -25,8 +25,8 @@ type NavDic struct {
 	Comments string
 	Pcode string
 	Status int64
-	OrderNum int64
-	CreateTime time.Time
+	OrderNum int64 `json:"OrderNum,string"`
+ 	CreateTime time.Time
 	UpdateTime time.Time
 }
 
