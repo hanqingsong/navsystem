@@ -18,5 +18,7 @@ func init() {
 	}
 	orm.Debug=true
 
-	orm.RegisterDataBase("default","mysql",fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", user, passwd, host, port, dbname))
+	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", user, passwd, host, port, dbname)
+	fmt.Println(dataSource)
+	orm.RegisterDataBase("default","mysql", dataSource)
 }
